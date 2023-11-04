@@ -1,11 +1,16 @@
-import Top from './topside';
-import Bottom from './bottom';
+import Bottom from './bottom/bottom';
+import ErrorBoundary from './errorBoundary/errorboundary';
+import ErrorBoundaryButton from './errorBoundary/errorboundarybutton';
+import Top from './top/top';
 function App() {
   return (
-    <div>
-      <Bottom />
+    <ErrorBoundary>
+      <ErrorBoundaryButton/>
       <Top />
-    </div>
+      <Bottom />
+      
+      
+    </ErrorBoundary>
   );
 }
 
