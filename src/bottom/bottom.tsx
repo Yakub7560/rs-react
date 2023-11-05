@@ -1,25 +1,27 @@
-import React from 'react';
+import { useState, useEffect } from "react";
 import './bottom.css';
 
-type Info = {
+type AllInfo = {
   count: number;
   pages: string;
   next: string;
   prev: string | null;
 };
 
-type Origin = {
+type Loc = {
   name: string;
   url: string;
 };
 
-type Location = {
+type Org = {
   name: string;
   url: string;
 };
 
-interface IResponceData {
-  info: Info;
+
+
+interface ResData {
+  info: AllInfo;
   results: [
     {
       id: number;
@@ -28,8 +30,8 @@ interface IResponceData {
       species: string;
       type: string;
       gender: string;
-      origin: Origin;
-      location: Location;
+      origin: Org;
+      location: Loc;
       image: string;
       episode: [string];
       url: string;
@@ -38,68 +40,57 @@ interface IResponceData {
   ];
 }
 
-interface IPropsLS {
-  SearchText?: string | undefined;
-}
-
-class Bottom extends React.Component<IPropsLS, {
-  SearchData: IResponceData | null; SearchText: string | undefined;
-  isLoading: boolean;
-}
->{
-
-  constructor(props: IPropsLS) {
-    super(props);
-    this.state = { SearchData: null, isLoading: true, SearchText: '' };
-  }
 
 
+function Bottom() {
+  const [SearchData, setSearchData] = useState<ResData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  componentDidMount() {
-    let request = 'https://rickandmortyapi.com/api/character/';
-    if (localStorage.getItem('myValue')) {
-      request = `https://rickandmortyapi.com/api/character/?name=${localStorage.getItem(
-        'myValue'
+
+  useEffect(() => {
+    let rqst = "https://rickandmortyapi.com/api/character/";
+    if (localStorage.getItem("myValue")) {
+      rqst = `https://rickandmortyapi.com/api/character/?name=${localStorage.getItem(
+        "myValue"
       )}`;
     }
+
     setTimeout(() => {
-      fetch(request)
+      fetch(rqst)
         .then((res) => {
           if (!res.ok) {
-            throw Error('There are no items');
+            throw Error("No any items");
           }
           return res.json();
         })
-        .then((data: IResponceData) => {
-          this.setState({ SearchData: data });
-          this.setState({ isLoading: false });
+        .then((data: ResData) => {
+          setSearchData(data);
+          setIsLoading(false);
         })
-        .catch((err) => {
-          console.log(err.message);
+        .catch((error) => {
+          console.log(error.message);
         });
     }, 1000);
-  }
+  }, []);
 
-
-
-  render() {
-    return (
-      <>
-        {this.state.isLoading && <div className='loading__page'>Page is loading, please wait...</div>}
-        <div className="container__cards">
-          {this.state.SearchData?.results.map((card) => (
-            <div key={`${card.id}`} className="container__card">
-              <img src={card.image} className="card__img" alt="card" />
-              <div> <span>Name:</span> {card.name}</div>
-              <div><span>Gender:</span> {card.gender}</div>
-              <div><span>Species:</span> {card.species}</div>
-              <div><span>Status:</span> {card.status}</div>
-            </div>
-          ))}
-        </div>
-      </>
-    );
-  }
+  return (
+    <>
+      {isLoading && <div className='loading__page'>Page is loading, please wait...</div>}
+      <div className="container__cards">
+        {SearchData?.results.map((item) => (
+          <div key={`${item.id}`} className="container__card">
+            <img src={item.image} className="card__img" alt="card" />
+            <div><span>Name:</span> {item.name}</div>
+            <div><span>Gender:</span> {item.gender}</div>
+            <div><span>Species:</span> {item.species} </div>
+            <div><span>Type:</span> {item.type} </div>
+            <div><span>Status:</span> {item.status}</div>
+            <div><span>Created:</span> {item.created}</div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
 }
-export default Bottom;
 
+export default Bottom;
